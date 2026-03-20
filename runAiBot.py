@@ -921,8 +921,14 @@ def apply_to_jobs(search_terms: list[str]) -> None:
     global current_city, failed_count, skip_count, easy_applied_count, external_jobs_count, tabs_count, pause_before_submit, pause_at_failed_question, useNewResume
     current_city = current_city.strip()
 
+    max_limit = globals().get("max_number_of_jobs_run", 1000)
+
     if randomize_search_order:  shuffle(search_terms)
     for searchTerm in search_terms:
+        if (easy_applied_count + external_jobs_count) >= max_limit:
+            print_lg(f"\n###############  Maximum application limit ({max_limit}) reached!  ###############\n")
+            return
+
         driver.get(f"https://www.linkedin.com/jobs/search/?keywords={searchTerm}")
         print_lg("\n________________________________________________________________________________________________________________________\n")
         print_lg(f'\n>>>> Now searching for "{searchTerm}" <<<<\n\n')
@@ -941,8 +947,11 @@ def apply_to_jobs(search_terms: list[str]) -> None:
                 buffer(3)
                 job_listings = driver.find_elements(By.XPATH, "//li[@data-occludable-job-id]")  
 
-            
                 for job in job_listings:
+                    if (easy_applied_count + external_jobs_count) >= max_limit:
+                        print_lg(f"\n###############  Maximum application limit ({max_limit}) reached!  ###############\n")
+                        return
+
                     if keep_screen_awake: pyautogui.press('shiftright')
                     if current_count >= switch_number: break
                     print_lg("\n-@-\n")

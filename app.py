@@ -248,6 +248,18 @@ def start_bot():
         return jsonify({"status": "already_running"})
 
     try:
+        payload = request.get_json(silent=True) or {}
+        max_jobs = payload.get("max_jobs", 0)
+        
+        # Write max_number_of_jobs_run to search.py
+        if os.path.exists(linkedin_config_path):
+            with open(linkedin_config_path, "r", encoding="utf-8") as f: c_search = f.read()
+            if re.search(r"^max_number_of_jobs_run\s*=\s*\d+", c_search, re.MULTILINE):
+                c_search = re.sub(r"^max_number_of_jobs_run\s*=\s*\d+", f"max_number_of_jobs_run = {int(max_jobs)}", c_search, flags=re.MULTILINE)
+            else:
+                c_search += f"\n# Added by UI\nmax_number_of_jobs_run = {int(max_jobs)}\n"
+            with open(linkedin_config_path, "w", encoding="utf-8") as f: f.write(c_search)
+
         script_path = os.path.join(os.path.dirname(__file__), "runAiBot.py")
         venv_python = sys.executable 
         proc = subprocess.Popen(

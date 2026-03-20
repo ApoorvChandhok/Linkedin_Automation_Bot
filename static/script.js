@@ -253,8 +253,15 @@ function connectTerminal() {
 
 // Start Bot Action
 document.getElementById('btn-start-bot').addEventListener('click', async () => {
+    const selectedCredits = parseFloat(document.getElementById('credit-slider').value) || 0;
+    const maxJobs = Math.floor(selectedCredits / 0.5);
+
     try {
-        const resp = await fetch('/api/start', { method: 'POST' });
+        const resp = await fetch('/api/start', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ max_jobs: maxJobs })
+        });
         if (resp.ok) {
             document.getElementById('terminal-window').innerHTML = '';
             appendLog('--- Bot Started ---', 'system');
@@ -307,7 +314,43 @@ async function loadJobs() {
     }
 }
 
+// Credit Slider Logic
+function initCreditSlider() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userCredits = parseFloat(urlParams.get('credits')) || 0;
+    
+    const creditSlider = document.getElementById('credit-slider');
+    const costDisplay = document.getElementById('credit-cost-display');
+    const jobsDisplay = document.getElementById('jobs-to-apply-display');
+    const maxCreditsLabel = document.getElementById('max-credits-label');
+    
+    if (creditSlider) {
+        creditSlider.max = userCredits;
+        maxCreditsLabel.textContent = `${userCredits} Max`;
+        
+        creditSlider.addEventListener('input', (e) => {
+            const selectedCredits = parseFloat(e.target.value);
+            const jobs = Math.floor(selectedCredits / 0.5); // 0.5 credits per job
+            
+            costDisplay.textContent = `Cost: ${selectedCredits} / ${userCredits} Credits`;
+            jobsDisplay.textContent = jobs;
+            
+            const startBtn = document.getElementById('btn-start-bot');
+            if (selectedCredits > 0) {
+                startBtn.innerHTML = `<i data-lucide="play"></i> Apply ( ${jobs} )`;
+            } else {
+                startBtn.innerHTML = `<i data-lucide="play"></i> Start Bot`;
+            }
+            lucide.createIcons();
+        });
+        
+        // Trigger once to set initial state
+        creditSlider.dispatchEvent(new Event('input'));
+    }
+}
+
 // Initial Initialization
 lucide.createIcons();
+initCreditSlider();
 loadConfig();
 loadJobs();

@@ -196,7 +196,25 @@
                         </div>
                     </div>
 
-                    <button id="btn-save-config" class="btn-primary btn-block" style="margin-top: auto; padding: 1rem; font-size: 1rem;">
+                    <!-- Credit Allocation Slider -->
+                    <div class="form-group" style="margin-top: 1.5rem; background: rgba(245, 158, 11, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label style="color: var(--color-cta); margin-bottom: 0; display: flex; align-items: center; gap: 0.4rem;">
+                                <i data-lucide="coins" style="width: 16px; height: 16px;"></i> Allocate Credits
+                            </label>
+                            <span id="credit-cost-display" style="font-size: 0.85rem; font-weight: 600; color: var(--color-cta);">Cost: 0 / 0 Credits</span>
+                        </div>
+                        <input type="range" id="credit-slider" min="0" max="10" value="0" step="0.5" class="form-control" style="padding: 0; height: 6px; appearance: auto;">
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                            <span>0</span>
+                            <span id="max-credits-label">Max</span>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">
+                            This will apply to <strong id="jobs-to-apply-display" style="color: var(--primary-color);">0</strong> jobs (0.5 credits / job)
+                        </p>
+                    </div>
+
+                    <button id="btn-save-config" class="btn-primary btn-block" style="margin-top: 1rem; padding: 1rem; font-size: 1rem;">
                         <i data-lucide="save"></i> Save Configuration
                     </button>
                 </div>
