@@ -24,57 +24,53 @@ version:    26.01.20.5.08
 default_resume_path = "all resumes/default/resume.pdf"      # Resume path relative to project root
 
 # What do you want to answer for questions that ask about years of experience you have, this is different from current_experience? 
-years_of_experience = "3"          # A number in quotes Eg: "0","1","2","3","4", etc.
+years_of_experience = '3'          # A number in quotes Eg: "0","1","2","3","4", etc.
 
 # Per-skill experience in years. Keys are matched (partial, case-insensitive) against the question label.
 # Add any skill you know here with how many years of experience you have.
 # Questions about skills NOT listed here will receive min_experience_for_unknown_skills as the answer.
 skill_experience = {
-    # --- Core Skills ---
-    "python":               "3",
-    "sql":                  "3",
-    "data analysis":        "3",
-    "data analytics":       "3",
-    "automation":           "3",
-    "excel":                "3",
-    "pandas":               "3",
-
-    # --- Data & Big Data ---
-    "pyspark":              "2",
-    "spark":                "2",
-    "big data":             "2",
-    "data pipeline":        "2",
-    "etl":                  "2",
-    "numpy":                "2",
-    "power bi":             "2",
-    "tableau":              "1",
-
-    # --- Databases ---
-    "mysql":                "3",
-    "postgresql":           "2",
-    "mongodb":              "1",
-    "nosql":                "1",
-
-    # --- Cloud & DevOps ---
-    "aws":                  "1",
-    "azure":                "1",
-    "gcp":                  "1",
-    "git":                  "2",
-    "linux":                "2",
-    "docker":               "1",
-
-    # --- Web / Other Frameworks (minimal exposure) ---
-    "flask":                "1",
-    "django":               "1",
-    "fastapi":              "1",
-    "rest api":             "2",
-    "api":                  "2",
-
-    # --- ML / AI (add only if you have some exposure) ---
-    "machine learning":     "1",
-    "deep learning":        "1",
-    "scikit":               "1",
-    "tensorflow":           "1",
+    "# --- Cloud & DevOps ---
+    "aws": 1,
+    "# --- Core Skills ---
+    "python": 3,
+    "# --- Data & Big Data ---
+    "pyspark": 2,
+    "# --- Databases ---
+    "mysql": 3,
+    "# --- ML / AI (add only if you have some exposure) ---
+    "machine learning": 1,
+    "# --- Web / Other Frameworks (minimal exposure) ---
+    "flask": 1,
+    "CI/CD": 3,
+    "api": 2,
+    "automation": 3,
+    "azure": 1,
+    "big data": 2,
+    "data analysis": 3,
+    "data analytics": 3,
+    "data pipeline": 2,
+    "deep learning": 1,
+    "django": 1,
+    "docker": 1,
+    "etl": 2,
+    "excel": 3,
+    "fastapi": 1,
+    "gcp": 1,
+    "git": 2,
+    "linux": 2,
+    "mongodb": 1,
+    "nosql": 1,
+    "numpy": 2,
+    "pandas": 3,
+    "postgresql": 2,
+    "power bi": 2,
+    "rest api": 2,
+    "scikit": 1,
+    "spark": 2,
+    "sql": 3,
+    "tableau": 1,
+    "tensorflow": 1
 }
 
 # For skills NOT found in skill_experience above, answer with this number (avoids 0-year rejection)
@@ -87,7 +83,7 @@ require_visa = "No"               # "Yes" or "No"
 website = "https://github.com/ApoorvChandhok"                   # "www.example.bio" or "" and so on....
 
 # Please provide the link to your LinkedIn profile.
-linkedIn = "https://www.linkedin.com/in/apoorvchandhok/"        # "https://www.linkedin.com/in/example" or "" and so on...
+linkedIn = 'https://www.linkedin.com/in/apoorvchandhok/'        # "https://www.linkedin.com/in/example" or "" and so on...
 
 # What is the status of your citizenship? # If left empty as "", tool will not answer the question. However, note that some companies make it compulsory to be answered
 # Valid options are: "U.S. Citizen/Permanent Resident", "Non-citizen allowed to work for any employer", "Non-citizen allowed to work for current employer", "Non-citizen seeking work authorization", "Canadian Citizen/Permanent Resident" or "Other"

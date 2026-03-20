@@ -10,7 +10,7 @@ import pyautogui
 # Set CSV field size limit to prevent field size errors
 csv.field_size_limit(1000000)  # Set to 1MB instead of default 131KB
 
-from random import choice, shuffle, randint
+from random import choice, shuffle, randint, uniform
 from datetime import datetime
 
 from selenium.webdriver.common.by import By
@@ -60,6 +60,7 @@ full_name = first_name + " " + middle_name + " " + last_name if middle_name else
 
 useNewResume = True
 randomly_answered_questions = set()
+applied_jobs_details = []  # Track applied jobs for Word report
 
 tabs_count = 1
 easy_applied_count = 0
@@ -683,7 +684,7 @@ def answer_questions(modal: WebElement, questions_list: set, work_location: str,
                             answer = desired_salary_lakhs
                         else:
                             answer = desired_salary
-                elif ('hear' in label or 'come across' in label) and 'this' in label and ('job' in label or 'position' in label): answer = "https://github.com/GodsScion/Auto_job_applier_linkedIn"
+                elif ('hear' in label or 'come across' in label) and 'this' in label and ('job' in label or 'position' in label): answer = "https://www.linkedin.com/in/apoorvchandhok/"
                 else: answer = answer_common_questions(label,answer)
                 
                 ##> ------ Yang Li : MARKYangL - Feature ------
@@ -1101,7 +1102,7 @@ def apply_to_jobs(search_terms: list[str]) -> None:
                                     if decision == "Discard Application": raise Exception("Job application discarded by user!")
                                     pause_before_submit = False if "Disable Pause" == decision else True
                                     # try_xp(modal, ".//span[normalize-space(.)='Review']")
-                                follow_company(modal)
+                                # follow_company(modal)  # Disabled: do not follow companies on apply
                                 if wait_span_click(driver, "Submit application", 2, scrollTop=True): 
                                     date_applied = datetime.now()
                                     if not wait_span_click(driver, "Done", 2): actions.send_keys(Keys.ESCAPE).perform()
@@ -1138,6 +1139,21 @@ def apply_to_jobs(search_terms: list[str]) -> None:
                     if application_link == "Easy Applied": easy_applied_count += 1
                     else:   external_jobs_count += 1
                     applied_jobs.add(job_id)
+
+                    # Track job details for Word report
+                    applied_jobs_details.append({
+                        'title': title,
+                        'company': company,
+                        'hr_name': hr_name,
+                        'date_applied': str(date_applied),
+                        'job_link': job_link,
+                        'description_snippet': (description[:200] + '...') if description and description != 'Unknown' and len(description) > 200 else description
+                    })
+
+                    # Random delay between applications (anti-detection)
+                    random_delay = uniform(5, 15)
+                    print_lg(f"Waiting {random_delay:.1f}s before next application (anti-detection)...")
+                    sleep(random_delay)
 
 
 
@@ -1186,6 +1202,81 @@ def run(total_runs: int) -> int:
 
 chatGPT_tab = False
 linkedIn_tab = False
+
+
+def generate_word_report(jobs_details: list[dict]) -> None:
+    '''
+    Generates a Word document report of all applied jobs.
+    Saved to "all excels/application_report_{date}.docx"
+    '''
+    if not jobs_details:
+        print_lg("No jobs applied in this run, skipping Word report generation.")
+        return
+    try:
+        from docx import Document
+        from docx.shared import Inches, Pt, RGBColor
+        from docx.enum.table import WD_TABLE_ALIGNMENT
+
+        doc = Document()
+        
+        # Title
+        title = doc.add_heading(f'LinkedIn Job Applications Report', level=0)
+        doc.add_paragraph(f'Generated on: {datetime.now().strftime("%B %d, %Y at %I:%M %p")}')
+        doc.add_paragraph(f'Total Jobs Applied: {len(jobs_details)}')
+        doc.add_paragraph('')
+
+        # Summary Table
+        doc.add_heading('Applications Summary', level=1)
+        table = doc.add_table(rows=1, cols=5)
+        table.style = 'Light Grid Accent 1'
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        
+        # Header row
+        headers = ['Job Title', 'Company', 'HR Name', 'Date Applied', 'Job Link']
+        for i, header in enumerate(headers):
+            cell = table.rows[0].cells[i]
+            cell.text = header
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.bold = True
+                    run.font.size = Pt(9)
+
+        # Data rows
+        for job in jobs_details:
+            row = table.add_row().cells
+            row[0].text = str(job.get('title', 'N/A'))
+            row[1].text = str(job.get('company', 'N/A'))
+            row[2].text = str(job.get('hr_name', 'Unknown'))
+            row[3].text = str(job.get('date_applied', 'N/A'))
+            row[4].text = str(job.get('job_link', 'N/A'))
+            for cell in row:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.size = Pt(8)
+
+        doc.add_paragraph('')
+
+        # Job Details section
+        doc.add_heading('Job Description Snippets', level=1)
+        for i, job in enumerate(jobs_details, 1):
+            doc.add_heading(f'{i}. {job.get("title", "N/A")} — {job.get("company", "N/A")}', level=2)
+            snippet = job.get('description_snippet', 'No description available')
+            if snippet and snippet != 'Unknown':
+                doc.add_paragraph(snippet)
+            else:
+                doc.add_paragraph('Job description was not available.')
+            doc.add_paragraph('')
+
+        # Save the report
+        report_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        report_path = f"all excels/application_report_{report_date}.docx"
+        doc.save(report_path)
+        print_lg(f"Word report saved to: {report_path}")
+    except ImportError:
+        print_lg("python-docx is not installed! Run: pip install python-docx")
+    except Exception as e:
+        print_lg("Failed to generate Word report!", e)
+
 
 def main() -> None:
     total_runs = 1
@@ -1257,6 +1348,8 @@ def main() -> None:
         critical_error_log("In Applier Main", e)
         pyautogui.alert(e,alert_title)
     finally:
+        # Generate Word document report
+        generate_word_report(applied_jobs_details)
         summary = "Total runs: {}\nJobs Easy Applied: {}\nExternal job links collected: {}\nTotal applied or collected: {}\nFailed jobs: {}\nIrrelevant jobs skipped: {}\n".format(total_runs,easy_applied_count,external_jobs_count,easy_applied_count + external_jobs_count,failed_count,skip_count)
         print_lg(summary)
         print_lg("\n\nTotal runs:                     {}".format(total_runs))

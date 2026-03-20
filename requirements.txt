@@ -1,0 +1,16 @@
+# Core dependencies
+pyautogui
+selenium
+undetected-chromedriver
+
+# Web UI
+flask
+flask-cors
+
+# AI providers
+openai
+google-generativeai
+
+# Resume generation
+python-docx
+fpdf2

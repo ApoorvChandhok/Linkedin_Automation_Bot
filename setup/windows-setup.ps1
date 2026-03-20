@@ -41,9 +41,8 @@ while (-not (Test-Path -Path "C:\Program Files\Google\Chrome\Application\chrome.
 
 Write-Host "Google Chrome is installed."
 
-# Install required Python packages
-pip install selenium
-pip install undetected-chromedriver
+# Install required Python packages from requirements.txt
+pip install -r requirements.txt
 
 # Get the latest ChromeDriver version
 $latestVersionUrl = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"

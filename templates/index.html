@@ -1,201 +1,257 @@
-<!-- ##> ------ Karthik Sarode : karthik.sarode23@gmail.com - UI for excel files ------ -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Applied Jobs</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { 
-            border-collapse: collapse; 
-            width: 100%;
-            margin-top: 20px;
-        }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 12px; 
-            text-align: left; 
-        }
-        th { 
-            background-color: #f4f4f4; 
-            font-weight: bold;
-        }
-        tr:nth-child(even) { background-color: #f8f8f8; }
-        a { 
-            color: #0066cc;
-            text-decoration: none;
-        }
-        a:hover { text-decoration: underline; }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .sl-column {
-            width: 50px;
-            text-align: center;
-        }
-        .sort-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0 5px;
-            font-size: 12px;
-        }
-        .sort-button:hover {
-            color: #0066cc;
-        }
-        .applied-column {
-            width: 70px;
-            text-align: center;
-        }
-        .tick {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Auto-Applier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Applied Jobs History</h1>
-        <table id="jobsTable">
-            <thead>
-                <tr>
-                    <th class="sl-column">Sl No</th>
-                    <th>Job Title</th>
-                    <th>Company</th>  
-                    <th>HR Contact</th>
-                    <th>
-                        External Link
-                        <button class="sort-button" onclick="sortByExternalLink()">↕️</button>
-                    </th> 
-                    <th class="applied-column">Applied</th>
-                </tr>
-            </thead>
-            <tbody id="jobsBody"></tbody>
-        </table>
+    <div class="app-container">
+        
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary-color);">
+                <i data-lucide="linkedin" style="width: 28px; height: 28px;"></i>
+                <h1 style="color: var(--text-color);">LinkedIn Auto-Applier</h1>
+            </div>
+            <div style="margin-left: auto;">
+                <button id="btn-start-bot" class="btn-primary"><i data-lucide="play"></i> Start Bot</button>
+                <button id="btn-stop-bot" class="btn-danger" style="display: none;"><i data-lucide="square"></i> Stop Bot</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Layout Split: Config Form vs Terminal -->
+            <div class="layout-split">
+                
+                <!-- Left: Control Panel -->
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 1.1rem;">
+                        <i data-lucide="sliders-horizontal" style="width: 20px; height: 20px; color: var(--color-cta);"></i> Bot Configuration
+                    </h2>
+
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="openTab(event, 'tab-search')">Search Rules</button>
+                        <button class="tab-btn" onclick="openTab(event, 'tab-profile')">Profile Info</button>
+                        <button class="tab-btn" onclick="openTab(event, 'tab-skills')">Dynamic Skills</button>
+                    </div>
+
+                    <!-- TAB 1: Search Rules -->
+                    <div id="tab-search" class="tab-content" style="display:block;">
+                        <div class="form-group">
+                            <label for="search-terms">Search Terms (comma separated)</label>
+                            <input type="text" id="search-terms" class="form-control" placeholder="e.g. Data Analyst, Machine Learning">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Target Location</label>
+                            <input type="text" id="location" class="form-control" placeholder="e.g. Gurgaon, Haryana, India">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resume-upload">Upload Resume / CV <small style="color:var(--text-muted);">(Replaces existing)</small></label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="file" id="resume-upload" class="form-control" accept=".pdf,.doc,.docx" style="display: none;">
+                                <button id="btn-upload-resume" class="btn-secondary btn-block" onclick="document.getElementById('resume-upload').click();">
+                                    <i data-lucide="upload"></i> Select Resume
+                                </button>
+                            </div>
+                            <div id="resume-file-name" style="font-size: 0.8rem; margin-top: 0.3rem; color: var(--text-color);">No file chosen</div>
+                        </div>
+
+                        <label class="checkbox-label" style="margin-bottom: 1.5rem;">
+                            <input type="checkbox" id="easy-apply">
+                            <span class="checkbox-custom"></span>
+                            Easy Apply Only
+                        </label>
+
+                        <div class="advanced-filters">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="filter" style="width: 16px; height:16px;"></i> Advanced Filters
+                            </h3>
+                            
+                            <div class="form-group filter-group">
+                                <label>Sort by</label>
+                                <div class="radio-group" id="sort-by-grid">
+                                    <label><input type="radio" name="sort-by" value="Most recent"> Most recent</label>
+                                    <label><input type="radio" name="sort-by" value="Most relevant"> Most relevant</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group filter-group">
+                                <label>Date posted</label>
+                                <div class="radio-group" id="date-posted-grid">
+                                    <label><input type="radio" name="date-posted" value="Any time"> Any time</label>
+                                    <label><input type="radio" name="date-posted" value="Past month"> Past month</label>
+                                    <label><input type="radio" name="date-posted" value="Past week"> Past week</label>
+                                    <label><input type="radio" name="date-posted" value="Past 24 hours"> Past 24 hours</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group filter-group">
+                                <label>Experience level</label>
+                                <div class="checkbox-grid" id="experience-grid">
+                                    <label><input type="checkbox" name="experience" value="Internship"> Internship</label>
+                                    <label><input type="checkbox" name="experience" value="Entry level"> Entry level</label>
+                                    <label><input type="checkbox" name="experience" value="Associate"> Associate</label>
+                                    <label><input type="checkbox" name="experience" value="Mid-Senior level"> Mid-Senior level</label>
+                                    <label><input type="checkbox" name="experience" value="Director"> Director</label>
+                                    <label><input type="checkbox" name="experience" value="Executive"> Executive</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group filter-group">
+                                <label>Company Exclusions (Blacklist)</label>
+                                <div class="checkbox-grid" id="company-grid" style="margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <!-- Dynamic Companies will be injected here by JS -->
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="text" id="add-company-input" class="form-control" placeholder="+ Add a company">
+                                    <button id="btn-add-company" class="btn-secondary" style="padding: 0.4rem 0.8rem;">Add</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group filter-group">
+                                <label>Job Types</label>
+                                <div class="checkbox-grid" id="job-type-grid">
+                                    <label><input type="checkbox" name="job-type" value="Full-time"> Full-time</label>
+                                    <label><input type="checkbox" name="job-type" value="Part-time"> Part-time</label>
+                                    <label><input type="checkbox" name="job-type" value="Contract"> Contract</label>
+                                    <label><input type="checkbox" name="job-type" value="Temporary"> Temporary</label>
+                                    <label><input type="checkbox" name="job-type" value="Volunteer"> Volunteer</label>
+                                    <label><input type="checkbox" name="job-type" value="Internship"> Internship</label>
+                                    <label><input type="checkbox" name="job-type" value="Other"> Other</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group filter-group">
+                                <label>Job Model</label>
+                                <div class="checkbox-grid" id="onsite-grid">
+                                    <label><input type="checkbox" name="onsite" value="On-site"> On-site</label>
+                                    <label><input type="checkbox" name="onsite" value="Remote"> Remote</label>
+                                    <label><input type="checkbox" name="onsite" value="Hybrid"> Hybrid</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Profile Info -->
+                    <div id="tab-profile" class="tab-content" style="display:none;">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="first-name" class="form-control" placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="last-name" class="form-control" placeholder="Doe">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="phone-number" class="form-control" placeholder="9999999999">
+                        </div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Desired Salary (CTC)</label>
+                                <input type="number" id="desired-salary" class="form-control" placeholder="1000000" oninput="formatSalary('desired-salary','desired-salary-fmt')">
+                                <small id="desired-salary-fmt" style="color:var(--primary-color); font-size:0.8rem; font-weight:500;"></small>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Current CTC</label>
+                                <input type="number" id="current-ctc" class="form-control" placeholder="500000" oninput="formatSalary('current-ctc','current-ctc-fmt')">
+                                <small id="current-ctc-fmt" style="color:var(--primary-color); font-size:0.8rem; font-weight:500;"></small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Notice Period (Days)</label>
+                            <input type="number" id="notice-period" class="form-control" placeholder="15">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn Profile URL</label>
+                            <input type="text" id="linkedin-url" class="form-control" placeholder="https://linkedin.com/in/... ">
+                        </div>
+                        <div class="form-group">
+                            <label>Years of Experience (General)</label>
+                            <input type="number" id="years-of-experience" class="form-control" placeholder="3">
+                            <small style="color:var(--text-muted); font-size:0.8rem;">Used as default answer when asked about total experience</small>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: Dynamic Skills -->
+                    <div id="tab-skills" class="tab-content" style="display:none;">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Add skills you know and your years of experience so the AI can answer job questions dynamically.</p>
+                        <div class="form-group" style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <div id="skills-list-container" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 350px; overflow-y: auto;">
+                                <!-- Dynamic Skills appended here -->
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
+                                <input type="text" id="add-skill-name" class="form-control" style="flex:2;" placeholder="E.g. Python">
+                                <input type="number" id="add-skill-exp" class="form-control" style="flex:1;" placeholder="Years">
+                                <button id="btn-add-skill" class="btn-secondary" style="padding: 0.4rem 0.8rem;">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-save-config" class="btn-primary btn-block" style="margin-top: auto; padding: 1rem; font-size: 1rem;">
+                        <i data-lucide="save"></i> Save Configuration
+                    </button>
+                </div>
+
+                <!-- Right: Terminal -->
+                <div class="card terminal-panel">
+                    <div class="terminal-header">
+                        <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0; font-size: 1.1rem;">
+                            <i data-lucide="terminal" style="width: 20px; height: 20px; color: var(--primary-color);"></i> Live Logs
+                        </h2>
+                        <button id="btn-clear-terminal" class="btn-secondary" style="padding: 0.3rem 0.6rem;">
+                            <i data-lucide="trash-2" style="width: 16px; height:16px;"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="terminal-window" id="terminal-window">
+                        <div class="terminal-line system">Waiting for bot to start...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom: Data Table -->
+            <div class="card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; margin-bottom: 0;">
+                        <i data-lucide="table-properties" style="width: 20px; height: 20px;"></i> Applied Jobs History
+                    </h2>
+                    <button class="btn-secondary" onclick="loadJobs()" style="padding: 0.3rem 0.6rem;">
+                        <i data-lucide="refresh-cw" style="width: 16px; height:16px;"></i>
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>JOB TITLE</th>
+                                <th>COMPANY</th>
+                                <th>HR CONTACT</th>
+                                <th>EXTERNAL LINK</th>
+                                <th style="width: 120px;">APPLIED</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobsBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <script>
-        let sortOrder = 'asc';
-        let jobsData = [];
-        let appliedJobs = new Set();
-
-        // Replace the createTableRow function with this updated version
-        function createTableRow(job, index) {
-            const row = document.createElement('tr');
-            
-            // Serial Number
-            const slCell = document.createElement('td');
-            slCell.textContent = index + 1;
-            slCell.className = 'sl-column';
-            row.appendChild(slCell);
-            
-            // Job Title with link
-            const titleCell = document.createElement('td');
-            const titleLink = document.createElement('a');
-            titleLink.href = job.Job_Link;
-            titleLink.textContent = job.Title;
-            titleLink.target = '_blank';
-            titleCell.appendChild(titleLink);
-            row.appendChild(titleCell);
-            
-            // Company
-            const companyCell = document.createElement('td');
-            companyCell.textContent = job.Company;
-            row.appendChild(companyCell);
-            
-            // HR Name with link
-            const hrCell = document.createElement('td');
-            if (job.HR_Name && job.HR_Name !== 'Unknown') {
-                const hrLink = document.createElement('a');
-                hrLink.href = job.HR_Link;
-                hrLink.textContent = job.HR_Name;
-                hrLink.target = '_blank';
-                hrCell.appendChild(hrLink);
-            } else {
-                hrCell.textContent = 'N/A';
-            }
-            row.appendChild(hrCell);
-            
-            // External Job Link
-            const extCell = document.createElement('td');
-            const appliedCell = document.createElement('td');
-            appliedCell.className = 'applied-column';
-
-            if (job.External_Job_link === 'Easy Applied') {
-                extCell.textContent = 'Easy Applied';
-                appliedCell.innerHTML = '<span class="tick">✓</span>';
-            } else if (job.External_Job_link) {
-                const extLink = document.createElement('a');
-                extLink.href = job.External_Job_link;
-                extLink.textContent = 'External Link';
-                extLink.target = '_blank';
-                
-                // Add click handler for external link
-                extLink.addEventListener('click', async () => {
-                    try {
-                        const response = await fetch(`/applied-jobs/${job.Job_ID}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        
-                        if (response.ok) {
-                            appliedCell.innerHTML = '<span class="tick">✓</span>';
-                            job.Date_Applied = new Date().toISOString();
-                        }
-                    } catch (error) {
-                        console.error('Error updating applied date:', error);
-                    }
-                });
-                
-                extCell.appendChild(extLink);
-                // Show tick if already applied
-                if (job.Date_Applied !== 'Pending') {
-                    appliedCell.innerHTML = '<span class="tick">✓</span>';
-                }
-            } else {
-                extCell.textContent = 'N/A';
-            }
-            row.appendChild(extCell);
-            row.appendChild(appliedCell);
-            
-            return row;
-        }
-
-        function sortByExternalLink() {
-            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-            
-            jobsData.sort((a, b) => {
-                const valueA = a.External_Job_link || '';
-                const valueB = b.External_Job_link || '';
-                
-                if (sortOrder === 'asc') {
-                    return valueA.localeCompare(valueB);
-                } else {
-                    return valueB.localeCompare(valueA);
-                }
-            });
-            
-            const tbody = document.getElementById('jobsBody');
-            tbody.innerHTML = '';
-            jobsData.forEach((job, index) => {
-                tbody.appendChild(createTableRow(job, index));
-            });
-        }
-
-        fetch('http://localhost:5000/applied-jobs')
-            .then(response => response.json())
-            .then(jobs => {
-                jobsData = jobs;
-                const tbody = document.getElementById('jobsBody');
-                jobs.forEach((job, index) => {
-                    tbody.appendChild(createTableRow(job, index));
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-<!-- ##< -->

@@ -1,0 +1,349 @@
+/* ═══════════════════════════════════════════════════════
+   LINKEDIN BOT STANDALONE DESIGN SYSTEM (Copied from Naukri Bot)
+   ═══════════════════════════════════════════════════════ */
+:root {
+    --bg-main: #0B0E14;
+    --bg-card: #141824;
+    --bg-hover: #1c2132;
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --primary-color: #3B82F6;
+    --primary-color-hover: #2563EB;
+    --color-success: #10B981;
+    --color-danger: #EF4444;
+    --color-cta: #F59E0B;
+    --border-color: #1f2937;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    
+    --transition-base: all 0.2s ease-in-out;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-color);
+    font-family: 'Fira Sans', -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a { text-decoration: none; color: var(--primary-color); }
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-sm);
+}
+
+.header {
+    background: var(--bg-card);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.layout-split {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: var(--spacing-md);
+    align-items: stretch;
+    margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 1024px) {
+    .layout-split { grid-template-columns: 1fr; }
+}
+
+/* ── Form Controls ── */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-sm);
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: var(--transition-base);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-top: var(--spacing-md);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.checkbox-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkbox-custom {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    transition: var(--transition-base);
+}
+
+.checkbox-label input:checked ~ .checkbox-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-label input:checked ~ .checkbox-custom::after {
+    content: "";
+    position: absolute;
+    display: block;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
+.checkbox-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.checkbox-grid input[type="checkbox"] {
+    accent-color: var(--primary-color);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ── Buttons ── */
+.btn-primary, .btn-secondary, .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition-base);
+}
+
+.btn-primary { background: var(--primary-color); color: white; }
+.btn-primary:hover { background: var(--primary-color-hover); }
+
+.btn-secondary { background: var(--bg-hover); color: var(--text-color); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background: #2a3143; }
+
+.btn-danger { background: transparent; border: 1px solid var(--color-danger); color: var(--color-danger); }
+.btn-danger:hover { background: rgba(239, 68, 68, 0.1); }
+
+.btn-block { width: 100%; justify-content: center; }
+
+/* ── Terminal Window ── */
+.terminal-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.terminal-window {
+    flex: 1;
+    background-color: #0d1117;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    overflow-y: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #e6edf3;
+    min-height: 300px;
+    max-height: 500px;
+    border: 1px solid var(--border-color);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.terminal-line { margin-bottom: 0.2rem; word-break: break-all; }
+.terminal-line.system { color: #8b949e; font-style: italic; }
+.terminal-line.error { color: #ff7b72; }
+.terminal-line.success { color: #3fb950; }
+
+/* ── Tables ── */
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+th { background-color: rgba(255, 255, 255, 0.02); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+.tick { color: var(--color-success); font-weight: bold; }
+
+/* ── Advanced Filters & Radio Buttons ── */
+.radio-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.radio-group input[type="radio"] {
+    accent-color: var(--primary-color);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.advanced-filters {
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--border-color);
+}
+
+.filter-group {
+    margin-bottom: 1rem;
+}
+.filter-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Segemented Tabs UI ── */
+.tabs-header {
+    display: flex;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.35rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+.tab-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    text-align: center;
+}
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+/* SCROLLBAR CUSTOMIZATION */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #44475a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+

@@ -104,9 +104,8 @@ start "" "%chromedriver_dir%\chromedriver.exe"
 
 
 :: Check if python and chrome are installed or not
-:: pip install undetected-chromedriver
-:: pip install setuptools
-:: pip install pyautogui
+:: Install required Python packages from requirements.txt
+pip install -r requirements.txt
 
 
 
